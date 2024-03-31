@@ -1,15 +1,19 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+
 
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
-  database: "secrets",
-  password: "123456",
+  database: process.env.db_pass,
+  password: process.env.pg_pass,
   port: 5432,
 });
 db.connect();
@@ -34,9 +38,7 @@ app.post("/register", async (req, res) => {
   const password = req.body.password;
 
   try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email]);
 
     if (checkResult.rows.length > 0) {
       res.send("Email already exists. Try logging in.");
@@ -45,7 +47,7 @@ app.post("/register", async (req, res) => {
         "INSERT INTO users (email, password) VALUES ($1, $2)",
         [email, password]
       );
-      console.log(result);
+      // console.log(result);
       res.render("secrets.ejs");
     }
   } catch (err) {
@@ -54,18 +56,15 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const email = req.body.email;
+  const email = req.body.username;
   const password = req.body.password;
-
+  
   try {
-    const result = await db.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
+    const result = await db.query("SELECT * FROM users WHERE email = $1", [email]);
     if (result.rows.length > 0 ) {
-      const user = result.rows[0];
-      const storedPassword = user.password;
+      const user = result.rows[0].password;
 
-      if (password === storedPassword) {
+      if (password === user) {
         res.render("secrets.ejs");
       } else {
         res.send("Incorrect Password");
@@ -79,5 +78,5 @@ app.post("/login", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on port http://localhost:${port}`);
 });
