@@ -9,12 +9,13 @@ const app = express();
 const port = 3000;
 
 const db = new pg.Client({
-  user: "postgres",
-  host: "localhost",
+  user: process.env.user_db,
+  host: process.env.host_db,
   database: process.env.db_pass,
   password: process.env.pg_pass,
-  port: 5432,
+  port: process.env.port_db,
 });
+
 db.connect();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -77,5 +78,5 @@ app.post("/login", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
