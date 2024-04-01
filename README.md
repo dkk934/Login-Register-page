@@ -18,9 +18,9 @@ This is a simple Node.js application using Express.js for user registration and 
 
 ## Usage
 
-- Visit `http://localhost:3000` to view the home page.
-- Visit `http://localhost:3000/login` to view the login page.
-- Visit `http://localhost:3000/register` to view the registration page.
+- Visit `http://https://login-register-page-80az.onrender.com/` to view the home page.
+- Visit `http://https://login-register-page-80az.onrender.com/login` to view the login page.
+- Visit `http://https://login-register-page-80az.onrender.com/register` to view the registration page.
 
 ## Dependencies
 
