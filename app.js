@@ -68,7 +68,7 @@ app.post("/login", async (req, res) => {
     const checkResult = await db.query("SELECT * FROM users WHERE email = $1",[email]);
     if (checkResult.rows.length > 0) {
       const user_hash = checkResult.rows[0].password;
-      brt.compare(user_pass,user_hash,(err,result)=>{
+      brt.compare(password,user_hash,(err,result)=>{
         
         if (!result) {
           res.send('<h2>PASSWORD NOT MATCH,</h2><h1>try agin</h1>')
