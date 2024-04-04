@@ -6,29 +6,27 @@ This is a simple Node.js application using Express.js for user registration and 
 
 - User registration
 - User login
-- Serving static files
-- Rendering EJS templates
+- Password hashing for security
 
-## Installation
+## Setup and Installation
 
-1. Clone this repository.
-2. Install the dependencies with `npm install`.
-3. Set up your PostgreSQL database and update the connection details in the code.
-4. Run the server with `node app.js`.
+1. Clone the repository.
+2. Install dependencies with `npm install`.
+3. Set up your PostgreSQL database and update the `.env` file with your database credentials.
+4. Run the server with `npm start`.
 
 ## Usage
 
-- Visit `http://https://login-register-page-80az.onrender.com/` to view the home page.
-- Visit `http://https://login-register-page-80az.onrender.com/login` to view the login page.
-- Visit `http://https://login-register-page-80az.onrender.com/register` to view the registration page.
+- Navigate to the `/register` route to register a new user.
+- Navigate to the `/login` route to log in as an existing user.
 
 ## Dependencies
 
 - express
 - dotenv
-- body-parser
 - pg
-- ejs
+- bcrypt
+- body-parser
 
 ## Contributing
 
