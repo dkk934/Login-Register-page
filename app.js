@@ -11,11 +11,11 @@ const port = process.env.PORT || 3000;
 const salt_round = 10;
 
 const db = new pg.Client({
-  user: process.env.user_db,
-  host: process.env.host_db,
-  database: process.env.db_pass,
-  password: process.env.pg_pass,
-  port: process.env.port_db,
+  user: process.env.user,
+  host: process.env.host,
+  database: process.env.database,
+  password: process.env.password,
+  port_DB: process.env.port_DB,
   ssl: true
 });
 
@@ -41,14 +41,14 @@ app.post("/register", async (req, res) => {
   const password = req.body.password;
 
   try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [email]);
+    const checkResult = await db.query("SELECT * FROM users_login WHERE email_address = $1", [email]);
 
     if (checkResult.rows.length > 0) {
       res.send("Email already exists. Try logging in.");
     } else {
       brt.hash(password,salt_round,async(err, hash)=>{
         const result = await db.query(
-          "INSERT INTO users (email, password) VALUES ($1, $2)",
+          "INSERT INTO users_login (email_address, password) VALUES ($1, $2)",
           [email, hash]
         );
         console.log(result,hash);
@@ -65,7 +65,7 @@ app.post("/login", async (req, res) => {
   const password = req.body.password;
   
   try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1",[email]);
+    const checkResult = await db.query("SELECT * FROM users_login WHERE email_address = $1",[email]);
     if (checkResult.rows.length > 0) {
       const user_hash = checkResult.rows[0].password;
       brt.compare(password,user_hash,(err,result)=>{
@@ -85,5 +85,5 @@ app.post("/login", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port http//localhost:${port}`);
+  console.log(`Server running on port http://localhost:${port}`);
 });
