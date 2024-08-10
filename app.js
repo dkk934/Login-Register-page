@@ -5,6 +5,10 @@ import bodyParser from "body-parser";
 import pg from "pg";
 import brt from "bcrypt";
 
+import session from "express-session";
+import  Strategy  from "passport-local";
+import passport from "passport";
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,13 +20,22 @@ const db = new pg.Client({
   database: process.env.database,
   password: process.env.password,
   port_DB: process.env.port_DB,
-  ssl: true
+  // ssl: true
 });
 
 db.connect();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
+//allow create session id
+app.use(session({
+  secret:"TOPSECRET",
+  resave: false,
+  saveUninitialized:true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get("/", (req, res) => {
   res.render("home.ejs");
@@ -35,6 +48,15 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
   res.render("register.ejs");
 });
+//direct route to secretes if Authenticated
+app.get("/secrets",(req,res) => {
+ 
+  if (req.isAuthenticated()) {
+    res.render("secrets.ejs");
+  } else {
+    res.redirect("/");
+  }
+})
 
 app.post("/register", async (req, res) => {
   const email = req.body.username;
@@ -60,29 +82,47 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
-  const email = req.body.username;
-  const password = req.body.password;
-  
-  try {
-    const checkResult = await db.query("SELECT * FROM users_login WHERE email_address = $1",[email]);
+
+app.post("/login", passport.authenticate("local",{
+  successRedirect: "/secrets",
+  failureRedirect: "/login"
+}));
+
+//verify user
+passport.use(new Strategy(async function verify(username,password,cd){
+  try { 
+    const checkResult = await db.query("SELECT * FROM users_login WHERE email_address = $1",[username]);
     if (checkResult.rows.length > 0) {
-      const user_hash = checkResult.rows[0].password;
-      brt.compare(password,user_hash,(err,result)=>{
-        
-        if (!result) {
-          res.send('<h2>PASSWORD NOT MATCH,</h2><h1>try agin</h1>')
-        }else{
-          res.render("secrets.ejs")
+      const user = checkResult.rows[0];
+      const hash = user.password;
+      brt.compare(password,hash,(err,result)=>{
+        if (err) {
+          return cd(err,"Error comparing password:");
+        } else {
+          if (!result) {
+            return cd(null,false);
+          }else{
+            console.log(result);
+            return cd(false,user);
+          }
         }
-      })
+      });
     }else{
-      res.send(`<h1>${email} = 'NOT FOUND'</h1>`)
+      return cd("user not found")
     }
   } catch (error) {
-    console.log(error);
+    return cd(error);
   }
-});
+}))
+
+//store user info 
+passport.serializeUser((user,cd) =>{
+  cd(null,user);
+})
+
+passport.deserializeUser((user,cd) =>{
+  cd(null,user);
+})
 
 app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
