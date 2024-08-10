@@ -31,7 +31,10 @@ app.use(express.static("public"));
 app.use(session({
   secret:"TOPSECRET",
   resave: false,
-  saveUninitialized:true
+  saveUninitialized:true,
+  cookie:{
+    maxAge: 1000 * 60 * 60 * 24 
+  }
 }));
 
 app.use(passport.initialize());
@@ -70,11 +73,15 @@ app.post("/register", async (req, res) => {
     } else {
       brt.hash(password,salt_round,async(err, hash)=>{
         const result = await db.query(
-          "INSERT INTO users_login (email_address, password) VALUES ($1, $2)",
+          "INSERT INTO users_login (email_address, password) VALUES ($1, $2) RETURNING *",
           [email, hash]
         );
-        console.log(result,hash);
-        res.render("secrets.ejs");
+        // console.log(result);
+        const user = result.rows[0];
+        req.login(user,(err) =>{
+          console.error(err);
+          res.redirect("/secrets");
+        })
       });
     }
   } catch (err) {
@@ -102,7 +109,7 @@ passport.use(new Strategy(async function verify(username,password,cd){
           if (!result) {
             return cd(null,false);
           }else{
-            console.log(result);
+            // console.log(result);
             return cd(false,user);
           }
         }
