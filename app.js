@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 //allow create session id
 app.use(session({
-  secret:"TOPSECRET",
+  secret:process.env.eny_key,
   resave: false,
   saveUninitialized:true,
   cookie:{
