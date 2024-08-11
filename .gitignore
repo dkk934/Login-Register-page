@@ -2,7 +2,7 @@
 info.text
 queries.sql
 .DS_Store
-
+.gitignore
 # Logs
 logs
 *.log
