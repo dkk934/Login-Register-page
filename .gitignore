@@ -1,8 +1,13 @@
-.idx
+
 info.text
 queries.sql
 .DS_Store
 .gitignore
+
+.idx
+dev.nix
+
+
 # Logs
 logs
 *.log
