@@ -212,7 +212,6 @@ passport.deserializeUser((user, done) => {
   done(null, user); // Deserialize the user object from the session
 });
 
-// Start the server and listen on the specified port
 app.listen(port, () => {
   console.log(`Server running on port http://localhost:${port}`);
 });
